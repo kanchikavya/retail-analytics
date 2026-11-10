@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: retail-sales-analytics
+    name: retail-analytics
     runtime: python
-    buildCommand: pip install -r requirements.txt && python database_setup.py && python analysis_and_export.py
-    startCommand: gunicorn app:app
+    buildCommand: python database_setup.py && python analysis_and_export.py
+    startCommand: python server.py
     plan: free

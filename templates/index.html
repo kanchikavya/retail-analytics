@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retail Store Analytics Dashboard</title>
+    <title>Retail Store Analytics - Multi-Currency</title>
     <style>
         :root {
             --primary: #1e3a8a;
-            --primary-light: #3b82f6;
+            --primary-light: #2563eb;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #0f172a;
             --text-muted: #64748b;
-            --border: #e2e8f0;
+            --border: #cbd5e1;
             --success: #15803d;
             --success-bg: #dcfce7;
             --warning: #b45309;
@@ -24,51 +24,114 @@
         body { background-color: var(--bg); color: var(--text); padding: 2rem 1.5rem; line-height: 1.5; }
         .container { max-width: 1200px; margin: 0 auto; }
         
-        header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        h1 { font-size: 1.875rem; color: var(--primary); font-weight: 700; }
-        .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem; }
+        header { 
+            margin-bottom: 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 1.25rem; 
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 { font-size: 1.75rem; color: var(--primary); font-weight: 700; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
+        
+        /* Country Filter Bar */
+        .controls-bar {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .selector-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .selector-group label {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+        select.country-select {
+            padding: 0.55rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1.5px solid var(--primary-light);
+            background-color: #fff;
+            color: #0f172a;
+            cursor: pointer;
+            outline: none;
+        }
+        select.country-select:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
         
         /* Download Buttons */
         .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .btn {
             background-color: var(--primary);
             color: #fff;
-            padding: 0.6rem 1rem;
+            padding: 0.55rem 0.95rem;
             border-radius: 6px;
             text-decoration: none;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            transition: background 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
+            transition: opacity 0.2s;
         }
-        .btn:hover { background-color: var(--primary-light); }
-        .btn-secondary { background-color: #475569; }
-        .btn-secondary:hover { background-color: #64748b; }
+        .btn.disabled {
+            background-color: #94a3b8;
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn:hover:not(.disabled) { background-color: var(--primary-light); }
+
+        /* Empty State Placeholder */
+        .empty-placeholder {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            background: #fff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-title { font-size: 1.3rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; }
+        .empty-desc { color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto; }
 
         /* KPI Cards */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .kpi-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
-        .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; }
+        .kpi-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+        .kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--primary); margin-top: 0.4rem; }
         .kpi-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
 
         /* Tables */
         .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card-header { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .card-header { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th { background: #f1f5f9; padding: 0.75rem 1rem; font-weight: 600; border-bottom: 1px solid var(--border); color: #334155; }
         td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
         tr:hover { background-color: #f8fafc; }
 
         /* Badges */
-        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
         .badge-star { background: var(--success-bg); color: var(--success); }
         .badge-mod { background: var(--warning-bg); color: var(--warning); }
         .badge-under { background: var(--danger-bg); color: var(--danger); }
-        .badge-tier { background: #e0e7ff; color: #3730a3; }
 
         .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         @media (max-width: 850px) { .two-cols { grid-template-columns: 1fr; } }
@@ -78,164 +141,267 @@
     <div class="container">
         <header>
             <div>
-                <h1>Retail Store Analytics Dashboard</h1>
-                <div class="subtitle">Live SQL Database & Python Data Pipeline</div>
+                <h1>Retail Store Analytics System</h1>
+                <div class="subtitle">Built with pure Python (Standard Library) + SQL + Excel</div>
             </div>
             <div class="btn-group">
-                <a class="btn" href="/download/product_profitability_report.csv">📥 Products Excel CSV</a>
-                <a class="btn btn-secondary" href="/download/customer_segments_report.csv">📥 Customers CSV</a>
-                <a class="btn btn-secondary" href="/download/top_customers_by_city.csv">📥 Cities CSV</a>
+                <a id="btn-export-products" class="btn disabled" href="#">📥 Export Products Excel</a>
+                <a id="btn-export-customers" class="btn disabled" href="#">📥 Export Customers</a>
             </div>
         </header>
 
-        <!-- KPI Cards -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-title">Total Net Revenue</div>
-                <div class="kpi-value">${{ "%.2f"|format(kpis.total_revenue) }}</div>
-                <div class="kpi-sub">Across all completed transactions</div>
+        <!-- Dynamic Country & Currency Selector -->
+        <div class="controls-bar">
+            <div class="selector-group">
+                <label for="countrySelect">Select Country:</label>
+                <select id="countrySelect" class="country-select" onchange="onCountryChange(this.value)">
+                    <option value="">-- Select Country --</option>
+                    <option value="IN">India (₹ INR)</option>
+                    <option value="US">United States ($ USD)</option>
+                    <option value="GB">United Kingdom (£ GBP)</option>
+                    <option value="EU">European Union (€ EUR)</option>
+                    <option value="JP">Japan (¥ JPY)</option>
+                    <option value="CA">Canada (CA$ CAD)</option>
+                    <option value="AU">Australia (A$ AUD)</option>
+                </select>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Total Gross Profit</div>
-                <div class="kpi-value" style="color: var(--success);">${{ "%.2f"|format(kpis.total_profit) }}</div>
-                <div class="kpi-sub">Overall profit earned</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Average Profit Margin</div>
-                <div class="kpi-value">{{ "%.1f"|format(kpis.avg_margin) }}%</div>
-                <div class="kpi-sub">Healthy gross margin benchmark</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Total Units Sold</div>
-                <div class="kpi-value">{{ kpis.total_units }}</div>
-                <div class="kpi-sub">Items dispatched</div>
+            <div id="currencyNotice" style="font-size: 0.88rem; color: var(--text-muted);">
+                Default: <em>No country selected (empty dashboard)</em>
             </div>
         </div>
 
-        <!-- Product Profitability Table -->
-        <div class="card">
-            <div class="card-header">
-                <span>Product Profitability Analysis (SQL Aggregations)</span>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>Cost</th>
-                            <th>Price</th>
-                            <th>Units Sold</th>
-                            <th>Net Revenue</th>
-                            <th>Gross Profit</th>
-                            <th>Margin</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in products %}
-                        <tr>
-                            <td>{{ p[0] }}</td>
-                            <td><strong>{{ p[1] }}</strong></td>
-                            <td>{{ p[2] }}</td>
-                            <td>${{ "%.2f"|format(p[3]) }}</td>
-                            <td>${{ "%.2f"|format(p[4]) }}</td>
-                            <td>{{ p[5] }}</td>
-                            <td>${{ "%.2f"|format(p[6]) }}</td>
-                            <td style="font-weight: 600; color: #166534;">${{ "%.2f"|format(p[8]) }}</td>
-                            <td>
-                                {% set rev = p[6] %}
-                                {% set prof = p[8] %}
-                                {% if rev > 0 %}
-                                    {{ "%.1f"|format((prof / rev) * 100) }}%
-                                {% else %}
-                                    0.0%
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if p[8] >= 150 %}
-                                    <span class="badge badge-star">Star Product</span>
-                                {% elif p[8] >= 60 %}
-                                    <span class="badge badge-mod">Moderate</span>
-                                {% else %}
-                                    <span class="badge badge-under">Underperforming</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- 1. EMPTY STATE (Shown by default) -->
+        <div id="emptyState" class="empty-placeholder">
+            <div class="empty-icon">🌍</div>
+            <div class="empty-title">Dashboard is currently empty</div>
+            <div class="empty-desc">
+                Please select a country from the dropdown above. The metrics, product pricing, and currency will automatically update based on your selection.
             </div>
         </div>
 
-        <!-- Two Columns: Top Customer By City & Discount Impact -->
-        <div class="two-cols">
+        <!-- 2. DATA CONTENT (Hidden until country is chosen) -->
+        <div id="dataContent" style="display: none;">
+            
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Net Revenue</div>
+                    <div id="kpi-revenue" class="kpi-value">-</div>
+                    <div id="kpi-revenue-sub" class="kpi-sub">Across all sales</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Gross Profit</div>
+                    <div id="kpi-profit" class="kpi-value" style="color: var(--success);">-</div>
+                    <div class="kpi-sub">Overall profit earned</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Average Profit Margin</div>
+                    <div id="kpi-margin" class="kpi-value">-</div>
+                    <div class="kpi-sub">Healthy gross margin benchmark</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Units Sold</div>
+                    <div id="kpi-units" class="kpi-value">-</div>
+                    <div class="kpi-sub">Items dispatched</div>
+                </div>
+            </div>
+
+            <!-- Product Profitability Table -->
             <div class="card">
                 <div class="card-header">
-                    <span>Top Customer in Each City (SQL Window Function)</span>
+                    <span>Product Profitability Analysis</span>
+                    <span id="productCurrencyBadge" style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;"></span>
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>City</th>
-                                <th>Top Customer</th>
-                                <th>Orders</th>
-                                <th>Total Spend</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for c in city_top %}
-                            <tr>
-                                <td><strong>{{ c[0] }}</strong></td>
-                                <td>{{ c[1] }}</td>
-                                <td>{{ c[2] }}</td>
-                                <td style="font-weight: 600;">${{ "%.2f"|format(c[3]) }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span>Discount Impact Analysis</span>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
                                 <th>Category</th>
-                                <th>Units</th>
+                                <th>Cost Price</th>
+                                <th>Selling Price</th>
+                                <th>Units Sold</th>
                                 <th>Net Revenue</th>
-                                <th>Discounts Given</th>
-                                <th>Discount Loss Rate</th>
+                                <th>Gross Profit</th>
+                                <th>Margin (%)</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for d in discounts %}
-                            <tr>
-                                <td><strong>{{ d[0] }}</strong></td>
-                                <td>{{ d[2] }}</td>
-                                <td>${{ "%.2f"|format(d[4]) }}</td>
-                                <td style="color: var(--danger);">${{ "%.2f"|format(d[5]) }}</td>
-                                <td>
-                                    {% if d[3] > 0 %}
-                                        {{ "%.1f"|format((d[5] / d[3]) * 100) }}%
-                                    {% else %}
-                                        0.0%
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
+
+            <!-- Two Columns: Top Customer By City & Discount Impact -->
+            <div class="two-cols">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Top Customer in Each City</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Top Customer</th>
+                                    <th>Orders</th>
+                                    <th>Total Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cityTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span>Discount Impact Analysis</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Units</th>
+                                    <th>Net Revenue</th>
+                                    <th>Discounts Given</th>
+                                    <th>Discount Loss %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="discountTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /#dataContent -->
 
     </div>
+
+    <script>
+        function onCountryChange(countryCode) {
+            const emptyState = document.getElementById("emptyState");
+            const dataContent = document.getElementById("dataContent");
+            const btnProducts = document.getElementById("btn-export-products");
+            const btnCustomers = document.getElementById("btn-export-customers");
+            const notice = document.getElementById("currencyNotice");
+
+            if (!countryCode) {
+                // Return to default empty state
+                emptyState.style.display = "block";
+                dataContent.style.display = "none";
+                btnProducts.classList.add("disabled");
+                btnProducts.href = "#";
+                btnCustomers.classList.add("disabled");
+                btnCustomers.href = "#";
+                notice.innerHTML = "Default: <em>No country selected (empty dashboard)</em>";
+                return;
+            }
+
+            notice.innerHTML = "Fetching converted data for <strong>" + countryCode + "</strong>...";
+
+            fetch("/api/data?country=" + encodeURIComponent(countryCode))
+                .then(res => res.json())
+                .then(data => {
+                    const sym = data.currency_symbol;
+                    const code = data.currency_code;
+                    const countryName = data.country_name;
+
+                    notice.innerHTML = "Active Currency: <strong>" + sym + " " + code + "</strong> (" + countryName + ")";
+                    document.getElementById("productCurrencyBadge").innerText = "Amounts shown in " + sym + " (" + code + ")";
+
+                    // Update Download Links
+                    btnProducts.classList.remove("disabled");
+                    btnProducts.href = "/download?country=" + countryCode + "&type=products";
+                    btnCustomers.classList.remove("disabled");
+                    btnCustomers.href = "/download?country=" + countryCode + "&type=customers";
+
+                    // Update KPI Cards
+                    document.getElementById("kpi-revenue").innerText = sym + formatNum(data.kpis.total_revenue);
+                    document.getElementById("kpi-profit").innerText = sym + formatNum(data.kpis.total_profit);
+                    document.getElementById("kpi-margin").innerText = data.kpis.avg_margin.toFixed(1) + "%";
+                    document.getElementById("kpi-units").innerText = data.kpis.total_units;
+
+                    // Populate Products Table
+                    const pTbody = document.getElementById("productsTableBody");
+                    pTbody.innerHTML = "";
+                    data.products.forEach(p => {
+                        const tr = document.createElement("tr");
+                        const margin = p.net_revenue > 0 ? ((p.gross_profit / p.net_revenue) * 100).toFixed(1) + "%" : "0.0%";
+                        
+                        let badgeClass = "badge-mod";
+                        let statusText = "Moderate";
+                        if (p.gross_profit >= 150 * data.rate) {
+                            badgeClass = "badge-star";
+                            statusText = "Star Product";
+                        } else if (p.gross_profit < 60 * data.rate) {
+                            badgeClass = "badge-under";
+                            statusText = "Underperforming";
+                        }
+
+                        tr.innerHTML = `
+                            <td>${p.product_id}</td>
+                            <td><strong>${escapeHtml(p.product_name)}</strong></td>
+                            <td>${escapeHtml(p.category)}</td>
+                            <td>${sym}${formatNum(p.cost_price)}</td>
+                            <td>${sym}${formatNum(p.selling_price)}</td>
+                            <td>${p.units_sold}</td>
+                            <td>${sym}${formatNum(p.net_revenue)}</td>
+                            <td style="font-weight:600; color:#166534;">${sym}${formatNum(p.gross_profit)}</td>
+                            <td>${margin}</td>
+                            <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        `;
+                        pTbody.appendChild(tr);
+                    });
+
+                    // Populate City Top Customers Table
+                    const cTbody = document.getElementById("cityTableBody");
+                    cTbody.innerHTML = "";
+                    data.city_top.forEach(c => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td><strong>${escapeHtml(c.city)}</strong></td>
+                            <td>${escapeHtml(c.customer_name)}</td>
+                            <td>${c.total_orders}</td>
+                            <td style="font-weight:600;">${sym}${formatNum(c.total_spent)}</td>
+                        `;
+                        cTbody.appendChild(tr);
+                    });
+
+                    // Populate Discount Impact Table
+                    const dTbody = document.getElementById("discountTableBody");
+                    dTbody.innerHTML = "";
+                    data.discounts.forEach(d => {
+                        const tr = document.createElement("tr");
+                        const lossRate = d.gross_revenue > 0 ? ((d.discounts_given / d.gross_revenue) * 100).toFixed(1) + "%" : "0.0%";
+                        tr.innerHTML = `
+                            <td><strong>${escapeHtml(d.category)}</strong></td>
+                            <td>${d.units_sold}</td>
+                            <td>${sym}${formatNum(d.net_revenue)}</td>
+                            <td style="color:var(--danger);">${sym}${formatNum(d.discounts_given)}</td>
+                            <td>${lossRate}</td>
+                        `;
+                        dTbody.appendChild(tr);
+                    });
+
+                    // Show content, hide empty state
+                    emptyState.style.display = "none";
+                    dataContent.style.display = "block";
+                })
+                .catch(err => {
+                    console.error("Error loading data:", err);
+                    notice.innerHTML = "<span style='color:red;'>Failed to load country data.</span>";
+                });
+        }
+
+        function formatNum(num) {
+            return Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
 </body>
 </html>
