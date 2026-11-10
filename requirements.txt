@@ -1,2 +1,1 @@
-# No third-party dependencies required.
-# Pure Python Standard Library only (http.server, sqlite3, csv, json).
+gunicorn>=21.2.0
