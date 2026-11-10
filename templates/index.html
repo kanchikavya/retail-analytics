@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retail Store Analytics - Multi-Currency</title>
+    <title>Retail Store Analytics - Location Currency</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -25,20 +25,20 @@
         .container { max-width: 1200px; margin: 0 auto; }
         
         header { 
-            margin-bottom: 2rem; 
+            margin-bottom: 1.5rem; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             flex-wrap: wrap; 
             gap: 1.25rem; 
-            padding-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
             border-bottom: 1px solid var(--border);
         }
         h1 { font-size: 1.75rem; color: var(--primary); font-weight: 700; }
         .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
         
-        /* Country Filter Bar */
-        .controls-bar {
+        /* Location Bar */
+        .location-bar {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -50,17 +50,18 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        .selector-group {
+        .location-controls {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
-        .selector-group label {
+        .location-controls label {
             font-weight: 600;
             color: #1e293b;
             font-size: 0.95rem;
         }
-        select.country-select {
+        select.location-select {
             padding: 0.55rem 1rem;
             font-size: 0.95rem;
             font-weight: 500;
@@ -71,9 +72,30 @@
             cursor: pointer;
             outline: none;
         }
-        select.country-select:focus {
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        .btn-load {
+            background-color: var(--primary-light);
+            color: #fff;
+            border: none;
+            padding: 0.55rem 1.1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
         }
+        .btn-load:hover { background-color: var(--primary); }
+
+        .btn-clear {
+            background-color: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 0.55rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-clear:hover { background-color: #cbd5e1; }
         
         /* Download Buttons */
         .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -88,34 +110,20 @@
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            transition: opacity 0.2s;
         }
         .btn.disabled {
             background-color: #94a3b8;
             pointer-events: none;
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
         }
         .btn:hover:not(.disabled) { background-color: var(--primary-light); }
-
-        /* Empty State Placeholder */
-        .empty-placeholder {
-            text-align: center;
-            padding: 4rem 1.5rem;
-            background: #fff;
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-        .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-        .empty-title { font-size: 1.3rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; }
-        .empty-desc { color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto; }
 
         /* KPI Cards */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .kpi-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
-        .kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--primary); margin-top: 0.4rem; }
+        .kpi-value { font-size: 1.7rem; font-weight: 700; color: var(--primary); margin-top: 0.4rem; min-height: 2.2rem; }
         .kpi-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
 
         /* Tables */
@@ -126,6 +134,14 @@
         th { background: #f1f5f9; padding: 0.75rem 1rem; font-weight: 600; border-bottom: 1px solid var(--border); color: #334155; }
         td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
         tr:hover { background-color: #f8fafc; }
+
+        .empty-cell {
+            text-align: center;
+            padding: 3rem 1rem !important;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            background: #fafafa;
+        }
 
         /* Badges */
         .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
@@ -141,8 +157,8 @@
     <div class="container">
         <header>
             <div>
-                <h1>Retail Store Analytics System</h1>
-                <div class="subtitle">Built with pure Python (Standard Library) + SQL + Excel</div>
+                <h1>Retail Store Analytics Dashboard</h1>
+                <div class="subtitle">Location-Based Currency Engine (Pure Python + SQL + Excel)</div>
             </div>
             <div class="btn-group">
                 <a id="btn-export-products" class="btn disabled" href="#">📥 Export Products Excel</a>
@@ -150,12 +166,12 @@
             </div>
         </header>
 
-        <!-- Dynamic Country & Currency Selector -->
-        <div class="controls-bar">
-            <div class="selector-group">
-                <label for="countrySelect">Select Country:</label>
-                <select id="countrySelect" class="country-select" onchange="onCountryChange(this.value)">
-                    <option value="">-- Select Country --</option>
+        <!-- Location & Currency Bar -->
+        <div class="location-bar">
+            <div class="location-controls">
+                <label for="locationSelect">📍 Location:</label>
+                <select id="locationSelect" class="location-select">
+                    <option value="">-- Choose Location --</option>
                     <option value="IN">India (₹ INR)</option>
                     <option value="US">United States ($ USD)</option>
                     <option value="GB">United Kingdom (£ GBP)</option>
@@ -164,166 +180,198 @@
                     <option value="CA">Canada (CA$ CAD)</option>
                     <option value="AU">Australia (A$ AUD)</option>
                 </select>
+                <button class="btn-load" onclick="loadLocationData()">Load Analytics</button>
+                <button class="btn-clear" onclick="clearDashboard()">Clear</button>
             </div>
-            <div id="currencyNotice" style="font-size: 0.88rem; color: var(--text-muted);">
-                Default: <em>No country selected (empty dashboard)</em>
-            </div>
-        </div>
-
-        <!-- 1. EMPTY STATE (Shown by default) -->
-        <div id="emptyState" class="empty-placeholder">
-            <div class="empty-icon">🌍</div>
-            <div class="empty-title">Dashboard is currently empty</div>
-            <div class="empty-desc">
-                Please select a country from the dropdown above. The metrics, product pricing, and currency will automatically update based on your selection.
+            <div id="statusInfo" style="font-size: 0.88rem; color: var(--text-muted);">
+                Status: <em>Initially empty — select location or click Load</em>
             </div>
         </div>
 
-        <!-- 2. DATA CONTENT (Hidden until country is chosen) -->
-        <div id="dataContent" style="display: none;">
-            
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-title">Total Net Revenue</div>
-                    <div id="kpi-revenue" class="kpi-value">-</div>
-                    <div id="kpi-revenue-sub" class="kpi-sub">Across all sales</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">Total Gross Profit</div>
-                    <div id="kpi-profit" class="kpi-value" style="color: var(--success);">-</div>
-                    <div class="kpi-sub">Overall profit earned</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">Average Profit Margin</div>
-                    <div id="kpi-margin" class="kpi-value">-</div>
-                    <div class="kpi-sub">Healthy gross margin benchmark</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">Total Units Sold</div>
-                    <div id="kpi-units" class="kpi-value">-</div>
-                    <div class="kpi-sub">Items dispatched</div>
-                </div>
+        <!-- KPI Cards (Initially Empty) -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Net Revenue</div>
+                <div id="kpi-revenue" class="kpi-value">—</div>
+                <div class="kpi-sub">Total sales volume</div>
             </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Gross Profit</div>
+                <div id="kpi-profit" class="kpi-value" style="color: var(--success);">—</div>
+                <div class="kpi-sub">Gross margin profits</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Average Profit Margin</div>
+                <div id="kpi-margin" class="kpi-value">—</div>
+                <div class="kpi-sub">Store benchmark</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Units Sold</div>
+                <div id="kpi-units" class="kpi-value">—</div>
+                <div class="kpi-sub">Products dispatched</div>
+            </div>
+        </div>
 
-            <!-- Product Profitability Table -->
+        <!-- Product Profitability Table (Initially Empty) -->
+        <div class="card">
+            <div class="card-header">
+                <span>Product Profitability Analysis</span>
+                <span id="currencyBadge" style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;"></span>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Cost</th>
+                            <th>Selling Price</th>
+                            <th>Units Sold</th>
+                            <th>Net Revenue</th>
+                            <th>Gross Profit</th>
+                            <th>Margin</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr>
+                            <td colspan="10" class="empty-cell">
+                                📭 No data loaded. Select a location and click <strong>Load Analytics</strong>.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Two Columns: Top Customer By City & Discount Impact (Initially Empty) -->
+        <div class="two-cols">
             <div class="card">
                 <div class="card-header">
-                    <span>Product Profitability Analysis</span>
-                    <span id="productCurrencyBadge" style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;"></span>
+                    <span>Top Customer in Each City</span>
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Cost Price</th>
-                                <th>Selling Price</th>
-                                <th>Units Sold</th>
-                                <th>Net Revenue</th>
-                                <th>Gross Profit</th>
-                                <th>Margin (%)</th>
-                                <th>Status</th>
+                                <th>City</th>
+                                <th>Top Customer</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
                             </tr>
                         </thead>
-                        <tbody id="productsTableBody"></tbody>
+                        <tbody id="cityTableBody">
+                            <tr>
+                                <td colspan="4" class="empty-cell">No records loaded.</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Two Columns: Top Customer By City & Discount Impact -->
-            <div class="two-cols">
-                <div class="card">
-                    <div class="card-header">
-                        <span>Top Customer in Each City</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>City</th>
-                                    <th>Top Customer</th>
-                                    <th>Orders</th>
-                                    <th>Total Spent</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cityTableBody"></tbody>
-                        </table>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <span>Discount Impact Analysis</span>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <span>Discount Impact Analysis</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Units</th>
-                                    <th>Net Revenue</th>
-                                    <th>Discounts Given</th>
-                                    <th>Discount Loss %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="discountTableBody"></tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Units</th>
+                                <th>Net Revenue</th>
+                                <th>Discounts Given</th>
+                                <th>Loss %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="discountTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-cell">No records loaded.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-        </div> <!-- /#dataContent -->
+        </div>
 
     </div>
 
     <script>
-        function onCountryChange(countryCode) {
-            const emptyState = document.getElementById("emptyState");
-            const dataContent = document.getElementById("dataContent");
-            const btnProducts = document.getElementById("btn-export-products");
-            const btnCustomers = document.getElementById("btn-export-customers");
-            const notice = document.getElementById("currencyNotice");
+        // Auto-detect country based on user's browser location / timezone
+        function autoDetectCountry() {
+            try {
+                const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "").toLowerCase();
+                const lang = (navigator.language || "").toLowerCase();
 
-            if (!countryCode) {
-                // Return to default empty state
-                emptyState.style.display = "block";
-                dataContent.style.display = "none";
-                btnProducts.classList.add("disabled");
-                btnProducts.href = "#";
-                btnCustomers.classList.add("disabled");
-                btnCustomers.href = "#";
-                notice.innerHTML = "Default: <em>No country selected (empty dashboard)</em>";
-                return;
+                if (tz.includes("kolkata") || tz.includes("calcutta") || lang.includes("in")) return "IN";
+                if (tz.includes("london") || lang.includes("gb")) return "GB";
+                if (tz.includes("paris") || tz.includes("berlin") || tz.includes("rome") || tz.includes("madrid") || tz.includes("europe")) return "EU";
+                if (tz.includes("tokyo")) return "JP";
+                if (tz.includes("sydney") || tz.includes("melbourne") || tz.includes("australia")) return "AU";
+                if (tz.includes("toronto") || tz.includes("vancouver") || tz.includes("canada")) return "CA";
+                return "US";
+            } catch (e) {
+                return "US";
             }
+        }
 
-            notice.innerHTML = "Fetching converted data for <strong>" + countryCode + "</strong>...";
+        // Run on page load: Pre-set dropdown to detected location, but keep everything empty!
+        window.addEventListener("DOMContentLoaded", () => {
+            const detected = autoDetectCountry();
+            const select = document.getElementById("locationSelect");
+            if (select) {
+                select.value = detected;
+            }
+            const info = document.getElementById("statusInfo");
+            info.innerHTML = "📍 Detected Location: <strong>" + getCountryLabel(detected) + "</strong> (Click 'Load Analytics' to populate)";
+        });
+
+        function getCountryLabel(code) {
+            const labels = {
+                "IN": "India (₹ INR)",
+                "US": "United States ($ USD)",
+                "GB": "United Kingdom (£ GBP)",
+                "EU": "European Union (€ EUR)",
+                "JP": "Japan (¥ JPY)",
+                "CA": "Canada (CA$ CAD)",
+                "AU": "Australia (A$ AUD)"
+            };
+            return labels[code] || code;
+        }
+
+        function loadLocationData() {
+            const select = document.getElementById("locationSelect");
+            const countryCode = select.value || autoDetectCountry();
+            const info = document.getElementById("statusInfo");
+
+            info.innerHTML = "Fetching converted data for <strong>" + getCountryLabel(countryCode) + "</strong>...";
 
             fetch("/api/data?country=" + encodeURIComponent(countryCode))
                 .then(res => res.json())
                 .then(data => {
                     const sym = data.currency_symbol;
                     const code = data.currency_code;
-                    const countryName = data.country_name;
+                    const rate = data.rate;
 
-                    notice.innerHTML = "Active Currency: <strong>" + sym + " " + code + "</strong> (" + countryName + ")";
-                    document.getElementById("productCurrencyBadge").innerText = "Amounts shown in " + sym + " (" + code + ")";
+                    info.innerHTML = "Active Currency: <strong>" + sym + " " + code + "</strong> (" + data.country_name + ")";
+                    document.getElementById("currencyBadge").innerText = "All amounts converted to " + sym + " (" + code + ")";
 
-                    // Update Download Links
-                    btnProducts.classList.remove("disabled");
-                    btnProducts.href = "/download?country=" + countryCode + "&type=products";
-                    btnCustomers.classList.remove("disabled");
-                    btnCustomers.href = "/download?country=" + countryCode + "&type=customers";
+                    // Update export buttons
+                    const btnP = document.getElementById("btn-export-products");
+                    const btnC = document.getElementById("btn-export-customers");
+                    btnP.classList.remove("disabled");
+                    btnP.href = "/download?country=" + countryCode + "&type=products";
+                    btnC.classList.remove("disabled");
+                    btnC.href = "/download?country=" + countryCode + "&type=customers";
 
-                    // Update KPI Cards
+                    // KPI Cards
                     document.getElementById("kpi-revenue").innerText = sym + formatNum(data.kpis.total_revenue);
                     document.getElementById("kpi-profit").innerText = sym + formatNum(data.kpis.total_profit);
                     document.getElementById("kpi-margin").innerText = data.kpis.avg_margin.toFixed(1) + "%";
                     document.getElementById("kpi-units").innerText = data.kpis.total_units;
 
-                    // Populate Products Table
+                    // Products Table
                     const pTbody = document.getElementById("productsTableBody");
                     pTbody.innerHTML = "";
                     data.products.forEach(p => {
@@ -332,10 +380,10 @@
                         
                         let badgeClass = "badge-mod";
                         let statusText = "Moderate";
-                        if (p.gross_profit >= 150 * data.rate) {
+                        if (p.gross_profit >= 150 * rate) {
                             badgeClass = "badge-star";
                             statusText = "Star Product";
-                        } else if (p.gross_profit < 60 * data.rate) {
+                        } else if (p.gross_profit < 60 * rate) {
                             badgeClass = "badge-under";
                             statusText = "Underperforming";
                         }
@@ -355,7 +403,7 @@
                         pTbody.appendChild(tr);
                     });
 
-                    // Populate City Top Customers Table
+                    // Cities Table
                     const cTbody = document.getElementById("cityTableBody");
                     cTbody.innerHTML = "";
                     data.city_top.forEach(c => {
@@ -369,30 +417,53 @@
                         cTbody.appendChild(tr);
                     });
 
-                    // Populate Discount Impact Table
+                    // Discount Table
                     const dTbody = document.getElementById("discountTableBody");
                     dTbody.innerHTML = "";
                     data.discounts.forEach(d => {
                         const tr = document.createElement("tr");
-                        const lossRate = d.gross_revenue > 0 ? ((d.discounts_given / d.gross_revenue) * 100).toFixed(1) + "%" : "0.0%";
+                        const loss = d.gross_revenue > 0 ? ((d.discounts_given / d.gross_revenue) * 100).toFixed(1) + "%" : "0.0%";
                         tr.innerHTML = `
                             <td><strong>${escapeHtml(d.category)}</strong></td>
                             <td>${d.units_sold}</td>
                             <td>${sym}${formatNum(d.net_revenue)}</td>
                             <td style="color:var(--danger);">${sym}${formatNum(d.discounts_given)}</td>
-                            <td>${lossRate}</td>
+                            <td>${loss}</td>
                         `;
                         dTbody.appendChild(tr);
                     });
-
-                    // Show content, hide empty state
-                    emptyState.style.display = "none";
-                    dataContent.style.display = "block";
                 })
                 .catch(err => {
-                    console.error("Error loading data:", err);
-                    notice.innerHTML = "<span style='color:red;'>Failed to load country data.</span>";
+                    console.error("Failed to load data:", err);
+                    info.innerHTML = "<span style='color:red;'>Error loading data.</span>";
                 });
+        }
+
+        function clearDashboard() {
+            document.getElementById("kpi-revenue").innerText = "—";
+            document.getElementById("kpi-profit").innerText = "—";
+            document.getElementById("kpi-margin").innerText = "—";
+            document.getElementById("kpi-units").innerText = "—";
+
+            document.getElementById("productsTableBody").innerHTML = `
+                <tr><td colspan="10" class="empty-cell">📭 Dashboard cleared. Select location and click <strong>Load Analytics</strong>.</td></tr>
+            `;
+            document.getElementById("cityTableBody").innerHTML = `
+                <tr><td colspan="4" class="empty-cell">No records loaded.</td></tr>
+            `;
+            document.getElementById("discountTableBody").innerHTML = `
+                <tr><td colspan="5" class="empty-cell">No records loaded.</td></tr>
+            `;
+
+            const btnP = document.getElementById("btn-export-products");
+            const btnC = document.getElementById("btn-export-customers");
+            btnP.classList.add("disabled");
+            btnP.href = "#";
+            btnC.classList.add("disabled");
+            btnC.href = "#";
+
+            document.getElementById("currencyBadge").innerText = "";
+            document.getElementById("statusInfo").innerHTML = "Status: <em>Dashboard is empty</em>";
         }
 
         function formatNum(num) {
