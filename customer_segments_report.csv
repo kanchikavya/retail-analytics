@@ -1,0 +1,9 @@
+Customer ID,Customer Name,City,Total Orders,Units Purchased,Total Spend ($),Avg Spend per Order ($),Loyalty Tier
+5,Vikram Malhotra,Bangalore,3,9,343.46,114.49,Platinum
+3,Rohan Verma,Delhi,3,7,207.20,69.07,Gold
+4,Sneha Reddy,Hyderabad,3,8,197.65,65.88,Gold
+1,Aarav Sharma,Mumbai,4,6,194.47,48.62,Gold
+2,Priya Patel,Ahmedabad,3,9,167.93,55.98,Gold
+7,Karan Joshi,Pune,2,4,152.95,76.47,Gold
+8,Meera Nair,Chennai,2,18,152.92,76.46,Gold
+6,Ananya Sen,Kolkata,2,9,95.97,47.98,Silver

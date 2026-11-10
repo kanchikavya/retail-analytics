@@ -1,0 +1,11 @@
+Product ID,Product Name,Category,Cost Price ($),Selling Price ($),Units Sold,Net Revenue ($),Total Cost ($),Gross Profit ($),Profit Margin (%),Performance Status
+102,Mechanical Keyboard,Electronics,35.00,74.99,4,288.71,140.00,148.71,51.51,Moderate
+101,Wireless Optical Mouse,Electronics,12.00,24.99,9,224.91,108.00,116.91,51.98,Moderate
+103,USB-C Fast Cable (2m),Accessories,2.50,9.99,15,129.87,37.50,92.37,71.12,Moderate
+107,Noise-Cancelling Earbuds,Electronics,28.00,59.99,3,167.97,84.00,83.97,49.99,Moderate
+109,Microfiber Desk Mat,Accessories,6.00,18.00,7,121.50,42.00,79.50,65.43,Moderate
+106,Hardcover Dotted Journal,Home & Office,3.00,8.50,14,119.00,42.00,77.00,64.71,Moderate
+105,Ceramic Coffee Tumbler,Home & Office,4.50,14.99,7,104.93,31.50,73.43,69.98,Moderate
+108,Webcam HD 1080p,Electronics,22.00,48.00,3,139.20,66.00,73.20,52.59,Moderate
+110,Ergonomic Lumbar Cushion,Home & Office,11.00,26.00,5,122.20,55.00,67.20,54.99,Moderate
+104,Aluminum Laptop Stand,Accessories,14.00,32.50,3,94.25,42.00,52.25,55.44,Underperforming
